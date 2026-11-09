@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ระบบติดตามงานค้าง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ล็อกอิน / รอสิทธิ์ -->
+<section id="login">
+  <div class="login-card">
+    <div class="logo">✓</div>
+    <h2 style="margin:14px 0 2px" class="appTitle">ระบบติดตามงานค้าง</h2>
+    <div id="loginBox">
+      <p class="muted" style="margin:0 0 18px">เข้าสู่ระบบด้วยบัญชี Google เพื่อดูและติดตามสถานะเอกสาร</p>
+      <button class="gbtn" id="btnGoogle">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        เข้าสู่ระบบด้วย Google
+      </button>
+    </div>
+    <div id="pendingBox" class="hidden">
+      <p class="muted" style="margin:0 0 12px">บัญชี <b id="pendingEmail"></b> ยังไม่ได้รับสิทธิ์เข้าใช้ระบบ</p>
+      <p class="muted" style="margin:0 0 18px">กรุณาแจ้งผู้ดูแลระบบให้เพิ่มอีเมลนี้ในหน้า "ผู้ใช้และสิทธิ์"</p>
+      <button class="btn" style="width:100%" id="btnPendingOut">ออกจากระบบ / เปลี่ยนบัญชี</button>
+    </div>
+    <div class="err" id="loginErr"></div>
+  </div>
+</section>
+
+<!-- แอป -->
+<section id="app" class="hidden">
+  <header>
+    <div class="wrap">
+      <div class="top">
+        <div class="logo" style="width:36px;height:36px;font-size:16px">✓</div>
+        <div><h1 class="appTitle">ระบบติดตามงานค้าง</h1><div class="sub">ติดตามความสำคัญ ขั้นตอน และผู้ถือเอกสาร</div></div>
+        <div class="me">
+          <span id="meName" style="font-weight:600"></span>
+          <span class="chip-role" id="meRole"></span>
+          <button class="btn ghost" id="btnLogout">ออกจากระบบ</button>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab on" data-tab="overview">ภาพรวม</button>
+        <button class="tab" data-tab="list">รายการเอกสาร</button>
+        <button class="tab hidden" data-tab="users" id="tabUsers">ผู้ใช้และสิทธิ์</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="v-overview">
+      <div class="stats">
+        <div class="card stat"><div class="n" id="sOpen">0</div><div class="l">งานค้างทั้งหมด</div></div>
+        <div class="card stat urgent"><div class="n" id="sUrgent">0</div><div class="l">ด่วนมาก (ค้าง)</div></div>
+        <div class="card stat important"><div class="n" id="sImportant">0</div><div class="l">สำคัญ (ค้าง)</div></div>
+        <div class="card stat done"><div class="n" id="sDone">0</div><div class="l">เสร็จสิ้นแล้ว</div></div>
+      </div>
+      <div class="two">
+        <div class="card"><h2>จำนวนเอกสารในแต่ละขั้นตอน</h2><div id="byStep"></div></div>
+        <div class="card"><h2>งานค้างอยู่ที่ใคร</h2>
+          <table><thead><tr><th>ผู้ถือเอกสาร</th><th>ค้าง</th><th>ด่วนมาก</th></tr></thead><tbody id="byHolder"></tbody></table>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px">คลิกชื่อเพื่อดูรายการที่ค้าง</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="v-list" class="hidden">
+      <div class="listhead">
+        <div style="font-weight:600" id="countText"></div>
+        <button class="btn primary hidden" id="btnNew">+ ลงทะเบียนเอกสาร</button>
+      </div>
+      <div class="card filters">
+        <div class="search"><label class="f">ค้นหา</label><input class="in" id="fq" placeholder="เลขที่ ชื่อเรื่อง ผู้ถือ หรือรายละเอียด"></div>
+        <div><label class="f">ความสำคัญ</label><select class="in" id="fp"></select></div>
+        <div><label class="f">ขั้นตอน</label><select class="in" id="fs"></select></div>
+        <div><label class="f">อยู่ที่</label><select class="in" id="fh"></select></div>
+        <label class="check"><input type="checkbox" id="fd" checked> ซ่อนที่เสร็จแล้ว</label>
+      </div>
+      <div class="items" id="items"></div>
+    </div>
+
+    <div id="v-users" class="hidden">
+      <div class="listhead">
+        <div style="font-weight:600">ผู้ใช้และสิทธิ์</div>
+        <button class="btn primary" id="btnAddUser">+ เพิ่มผู้ใช้</button>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <table><thead><tr><th>อีเมล Google</th><th>ชื่อที่แสดง</th><th>สิทธิ์</th><th>สถานะ</th></tr></thead><tbody id="userRows"></tbody></table>
+        <div style="font-size:12px;color:var(--muted);margin-top:10px">ผู้ใช้ที่ไม่ได้เลือกสิทธิ์ใดเลย จะเข้ามาดูได้อย่างเดียว · ผู้ดูแลหลัก (เจ้าของระบบ) มีสิทธิ์ทุกอย่างเสมอ</div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<div id="modalRoot"></div>
+<div id="loading"><div class="spin"></div></div>
+<div id="toast" class="hidden"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
